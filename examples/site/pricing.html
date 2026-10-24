@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pricing - Acme Widgets</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* BUG overflow: a fixed-width comparison grid with no scroll container. */
+    .plans { display: grid; grid-template-columns: repeat(3, 240px); gap: 16px; }
+    .plan { background: var(--card); border-radius: 12px; padding: 16px; }
+    /* BUG overlap: the "new" ribbon is positioned on top of the heading text. */
+    .title { position: relative; }
+    .ribbon { position: absolute; left: 40px; top: 4px; font-size: 28px; font-weight: 700;
+              background: transparent; color: #b91c1c; }
+    /* BUG clipped-text: a fixed-width button that hides its overflow. */
+    .cta { width: 92px; overflow: hidden; white-space: nowrap; }
+    /* BUG tap-target: 18px icon buttons on touch screens. */
+    .icon { width: 18px; height: 18px; padding: 0; border: 0; border-radius: 4px;
+            background: var(--accent); color: var(--bg); font-size: 11px; line-height: 18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <div class="title">
+      <h1>Simple pricing</h1>
+      <span class="ribbon">NEW PLANS</span>
+    </div>
+    <div class="plans">
+      <section class="plan"><h2>Starter</h2><p>$9 per month</p>
+        <button class="btn cta" type="button">Start your free trial</button></section>
+      <section class="plan"><h2>Team</h2><p>$29 per month</p>
+        <button class="icon" type="button" aria-label="Plan details">i</button></section>
+      <section class="plan"><h2>Enterprise</h2><p>Talk to us</p>
+        <button class="icon" type="button" aria-label="Contact sales">?</button></section>
+    </div>
+  </main>
+  <footer><p>&copy; 2026 Acme Widgets (a fictional company).</p></footer>
+</body>
+</html>

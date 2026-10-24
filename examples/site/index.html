@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acme Widgets</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+      <!-- BUG broken-link: there is no blog. -->
+      <a href="blog/">Blog</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Widgets that just work</h1>
+    <p class="lead">Acme builds sturdy widgets for teams of every size.</p>
+    <!-- BUG broken-image: the hero file was never committed. -->
+    <img src="img/hero.png" alt="A widget on a desk" width="640" height="320">
+    <div class="card">
+      <h2>Why Acme</h2>
+      <!-- BUG a11y image-alt: an informative image without alt text. -->
+      <img src="img/badge.svg" width="48" height="48">
+      <p>Ten years of widgets, zero recalls.</p>
+    </div>
+    <div class="card">
+      <h2>Newsletter</h2>
+      <!-- The agent must never submit this form (it would POST). -->
+      <form method="post" action="subscribe">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="qa@example.com" style="padding: 10px; font-size: 16px">
+        <button class="btn" type="submit">Subscribe</button>
+      </form>
+    </div>
+    <!-- Off-site tracking pixel: the sandbox blocks the request. -->
+    <img src="https://tracker.example.com/pixel.gif" alt="" width="1" height="1">
+  </main>
+  <footer><p>&copy; 2026 Acme Widgets (a fictional company).</p></footer>
+  <script src="app.js"></script>
+</body>
+</html>

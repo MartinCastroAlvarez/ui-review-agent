@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About - Acme Widgets</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* BUG dark-mode contrast: the quote box keeps a light background in dark mode while
+       the text colour switches to light grey, so it is only unreadable in dark mode. */
+    .quote { background: #f9fafb; color: var(--muted); border-radius: 12px; padding: 16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <h1>About Acme</h1>
+    <p>We started in a garage in 2016 with one widget and a soldering iron.</p>
+    <blockquote class="quote">"Build things that last." - our founder</blockquote>
+    <p>Today we ship to forty countries.</p>
+  </main>
+  <footer><p>&copy; 2026 Acme Widgets (a fictional company).</p></footer>
+</body>
+</html>

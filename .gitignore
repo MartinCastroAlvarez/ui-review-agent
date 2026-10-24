@@ -1,0 +1,39 @@
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.python-version
+
+# --- Review output (screenshots can contain private page content) ---
+ui-review-report/
+.ui-review/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# --- Local agent state ---
+.claude/
+
+# --- Virtualenv ---
+.venv/
+poetry.toml

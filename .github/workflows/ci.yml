@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (ruff + mypy + bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: ruff check
+        run: poetry run ruff check ui_review tests
+      - name: ruff format --check
+        run: poetry run ruff format --check ui_review tests
+      - name: mypy
+        run: poetry run mypy ui_review
+      - name: bandit
+        run: poetry run bandit -c pyproject.toml -q -r ui_review
+
+  audit:
+    name: pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+      - name: pip-audit
+        run: |
+          # pip is tooling, not a shipped dependency: upgrade it so its own advisories
+          # don't fail the audit.
+          poetry run python -m pip install --upgrade -q pip
+          poetry run pip-audit
+
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    env:
+      # Browser tests fail instead of skipping when Chromium is missing.
+      UI_REVIEW_REQUIRE_BROWSER: "1"
+      UI_REVIEW_VISION: "off"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Install Chromium (headless shell) and its system libraries
+        run: poetry run playwright install --with-deps --only-shell chromium
+      - name: Run pytest (real headless Chromium, fake ollama, no network)
+        run: poetry run pytest -q
+      - name: Review the demo site (must find its bugs and exit 1)
+        run: |
+          set +e
+          poetry run ui-review examples/site -o ui-review-report
+          code=$?
+          set -e
+          test "$code" -eq 1
+          python - <<'PY'
+          import json
+          data = json.load(open("ui-review-report/report.json"))
+          checks = {f["check"] for f in data["findings"]}
+          expected = {"broken-image", "broken-link", "page-error", "failed-request", "overflow",
+                      "overlap", "clipped-text", "tap-target", "a11y", "blocked-request"}
+          missing = expected - checks
+          assert not missing, missing
+          print("demo ok:", data["counts"])
+          PY
+      - name: Upload the demo report
+        if: always() && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-review-report
+          path: ui-review-report/
+          retention-days: 7
+      - name: Build the wheel and check the bundled assets are inside
+        run: |
+          poetry build -q
+          python - <<'PY'
+          import glob, zipfile
+          names = zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist()
+          for f in ("axe.min.js", "LICENSE-axe-core.txt", "dom_checks.js", "read_dom.js",
+                    "guard.js", "py.typed"):
+              assert any(n.endswith(f) for n in names), f
+          print("wheel ok:", len(names), "files")
+          PY

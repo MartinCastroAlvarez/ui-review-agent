@@ -1,0 +1,42 @@
+# Copy to .github/workflows/ui-review.yml in your project.
+# Builds the site, reviews the static output in headless Chromium, publishes the JUnit
+# results and uploads the HTML report. Runs on free GitHub-hosted runners; no API keys.
+name: UI review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ui-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # Replace with your build (npm ci && npm run build, hugo, mkdocs build, ...).
+      - name: Build the site
+        run: echo "build your site into ./dist"
+
+      - name: Install ui-review-agent and Chromium
+        run: |
+          pip install "ui-review-agent @ git+https://github.com/MartinCastroAlvarez/ui-review-agent"
+          playwright install --with-deps --only-shell chromium
+
+      # Baselines live in the repo (commit them after `--update-baseline` on main).
+      - name: Review
+        run: |
+          ui-review ./dist --out ui-review-report \
+            --baseline .ui-review/baseline \
+            --max-pages 25 --fail-on major
+
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-review-report
+          path: ui-review-report/
